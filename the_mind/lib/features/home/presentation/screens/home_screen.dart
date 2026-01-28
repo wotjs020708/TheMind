@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../../lobby/data/repositories/room_repository.dart';
 import '../../../../shared/providers/supabase_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
+import '../../../../shared/widgets/adaptive/adaptive_button.dart';
+import '../../../../core/utils/haptic_feedback_utils.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -24,6 +26,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> _createRoom(int playerCount) async {
+    await HapticFeedbackUtils.medium();
     setState(() => _isLoading = true);
 
     try {
@@ -35,10 +38,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
       if (!mounted) return;
 
+      await HapticFeedbackUtils.light();
       // 로비 화면으로 이동
       context.push('/lobby/${room.code}');
     } catch (e) {
       if (!mounted) return;
+      await HapticFeedbackUtils.error();
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('방 생성 실패: $e')));
@@ -52,12 +57,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> _joinRoom() async {
     final roomCode = _roomCodeController.text.trim().toUpperCase();
     if (roomCode.isEmpty) {
+      await HapticFeedbackUtils.error();
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('방 코드를 입력해주세요')));
       return;
     }
 
+    await HapticFeedbackUtils.medium();
     setState(() => _isLoading = true);
 
     try {
@@ -70,6 +77,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (!mounted) return;
 
       if (room == null) {
+        await HapticFeedbackUtils.error();
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('존재하지 않는 방입니다')));
@@ -77,16 +85,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       }
 
       if (room.status != 'waiting') {
+        await HapticFeedbackUtils.error();
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('이미 시작된 게임입니다')));
         return;
       }
 
+      await HapticFeedbackUtils.light();
       // 로비 화면으로 이동
       context.push('/lobby/${room.code}');
     } catch (e) {
       if (!mounted) return;
+      await HapticFeedbackUtils.error();
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('방 참가 실패: $e')));
@@ -213,7 +224,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const SizedBox(height: AppTheme.spacingMd),
                     SizedBox(
                       height: 56,
-                      child: ElevatedButton.icon(
+                      child: AdaptiveButtonIcon(
                         onPressed: _isLoading ? null : _joinRoom,
                         icon:
                             _isLoading
@@ -279,11 +290,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   ) {
     return SizedBox(
       height: 56,
-      child: ElevatedButton.icon(
+      child: AdaptiveButtonIcon(
         onPressed: _isLoading ? null : () => _createRoom(count),
         icon: Icon(icon, size: 24),
         label: Text(label),
-        style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryColor),
+        color: AppTheme.primaryColor,
       ),
     );
   }
