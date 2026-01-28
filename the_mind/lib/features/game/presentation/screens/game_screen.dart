@@ -11,6 +11,7 @@ import 'package:the_mind/features/game/presentation/providers/game_state_provide
 import 'package:the_mind/features/game/presentation/providers/shuriken_proposal_provider.dart';
 import 'package:the_mind/features/lobby/data/repositories/room_repository.dart';
 import 'package:the_mind/shared/providers/supabase_provider.dart';
+import 'package:the_mind/shared/widgets/connection_status_banner.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   final String roomCode;
@@ -179,6 +180,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           body: SafeArea(
             child: Column(
               children: [
+                // 연결 상태 배너
+                const ConnectionStatusBanner(),
+
                 // 상단: 생명, 수리검
                 Padding(
                   padding: const EdgeInsets.all(16.0),
