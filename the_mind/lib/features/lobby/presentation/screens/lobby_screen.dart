@@ -3,6 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/lobby_provider.dart';
 import '../../../../shared/widgets/connection_status_banner.dart';
+import '../../../../shared/widgets/adaptive/adaptive_button.dart';
+import '../../../../shared/widgets/adaptive/adaptive_dialog.dart'
+    as adaptive
+    show showAdaptiveDialog, AdaptiveDialogAction;
+import '../../../../shared/widgets/adaptive/adaptive_text_field.dart';
+import '../../../../core/utils/haptic_feedback_utils.dart';
 import '../../../../shared/theme/app_theme.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -37,66 +43,66 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   Future<void> _showNameDialog() async {
     if (_hasJoined) return;
 
-    final name = await showDialog<String>(
+    String? name;
+
+    await adaptive.showAdaptiveDialog(
       context: context,
-      barrierDismissible: false,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('이름 입력'),
-            content: TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: '닉네임',
-                hintText: '플레이어 이름',
-              ),
-              autofocus: true,
-              onSubmitted: (value) {
-                if (value.trim().isNotEmpty) {
-                  Navigator.of(context).pop(value.trim());
-                }
-              },
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => context.go('/'),
-                child: const Text('취소'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  final name = _nameController.text.trim();
-                  if (name.isNotEmpty) {
-                    Navigator.of(context).pop(name);
-                  }
-                },
-                child: const Text('참가'),
-              ),
-            ],
-          ),
+      title: '이름 입력',
+      content: AdaptiveTextField(
+        controller: _nameController,
+        labelText: '닉네임',
+        placeholder: '플레이어 이름',
+      ),
+      actions: [
+        adaptive.AdaptiveDialogAction(
+          text: '취소',
+          isDestructive: true,
+          onPressed: () => context.go('/'),
+        ),
+        adaptive.AdaptiveDialogAction(
+          text: '참가',
+          isDefaultAction: true,
+          onPressed: () {},
+        ),
+      ],
     );
 
+    name = _nameController.text.trim();
+    if (name.isEmpty) name = null;
+
     if (name != null && mounted) {
+      await HapticFeedbackUtils.light();
       final playerId = await ref
           .read(lobbyProvider(widget.roomCode).notifier)
           .joinLobby(name);
       if (playerId != null) {
         setState(() => _hasJoined = true);
       } else {
-        if (mounted) context.go('/');
+        if (mounted) {
+          await HapticFeedbackUtils.error();
+          context.go('/');
+        }
       }
     } else {
-      if (mounted) context.go('/');
+      if (mounted) {
+        await HapticFeedbackUtils.error();
+        context.go('/');
+      }
     }
   }
 
   Future<void> _toggleReady() async {
+    await HapticFeedbackUtils.medium();
     await ref.read(lobbyProvider(widget.roomCode).notifier).toggleReady();
   }
 
   Future<void> _startGame() async {
+    await HapticFeedbackUtils.heavy();
     await ref.read(lobbyProvider(widget.roomCode).notifier).startGame();
   }
 
   Future<void> _leaveLobby() async {
+    await HapticFeedbackUtils.light();
     await ref.read(lobbyProvider(widget.roomCode).notifier).leaveLobby();
     if (mounted) context.go('/');
   }
@@ -417,16 +423,14 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                       // 준비 버튼
                       SizedBox(
                         height: 56,
-                        child: ElevatedButton.icon(
+                        child: AdaptiveButtonIcon(
                           onPressed: _hasJoined ? _toggleReady : null,
                           icon: Icon(isReady ? Icons.close : Icons.check),
                           label: Text(isReady ? '준비 취소' : '준비'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                isReady
-                                    ? AppTheme.textMuted
-                                    : AppTheme.primaryColor,
-                          ),
+                          color:
+                              isReady
+                                  ? AppTheme.textMuted
+                                  : AppTheme.primaryColor,
                         ),
                       ),
 
@@ -436,14 +440,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                       if (lobbyState.isHost)
                         SizedBox(
                           height: 56,
-                          child: ElevatedButton.icon(
+                          child: AdaptiveButtonIcon(
                             onPressed:
                                 lobbyState.allPlayersReady ? _startGame : null,
                             icon: const Icon(Icons.play_arrow, size: 28),
                             label: const Text('게임 시작'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.successColor,
-                            ),
+                            color: AppTheme.successColor,
                           ),
                         ),
                     ],

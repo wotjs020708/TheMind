@@ -12,6 +12,10 @@ import 'package:the_mind/features/game/presentation/providers/shuriken_proposal_
 import 'package:the_mind/features/lobby/data/repositories/room_repository.dart';
 import 'package:the_mind/shared/providers/supabase_provider.dart';
 import 'package:the_mind/shared/widgets/connection_status_banner.dart';
+import 'package:the_mind/shared/widgets/adaptive/adaptive_dialog.dart'
+    as adaptive
+    show showAdaptiveDialog, AdaptiveDialogAction;
+import 'package:the_mind/core/utils/haptic_feedback_utils.dart';
 import 'package:the_mind/shared/theme/app_theme.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
@@ -47,6 +51,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   void _playCard(GameCard card) async {
     if (_currentPlayerId == null || _roomId == null) return;
 
+    await HapticFeedbackUtils.medium();
     await ref
         .read(gameStateProvider(_roomId!).notifier)
         .playCard(playerId: _currentPlayerId!, cardNumber: card.number);
@@ -59,26 +64,26 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     gameState.whenData((state) async {
       if (state.shurikens <= 0) return;
 
-      final shouldPropose = await showDialog<bool>(
-        context: context,
-        builder:
-            (context) => AlertDialog(
-              title: const Text('수리검 사용'),
-              content: const Text('수리검 사용을 제안하시겠습니까?\n모든 플레이어가 동의해야 사용됩니다.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('취소'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text('제안'),
-                ),
-              ],
-            ),
-      );
+      await HapticFeedbackUtils.light();
+      final shouldPropose = await adaptive
+          .showAdaptiveDialog(
+            context: context,
+            title: '수리검 사용',
+            content: const Text('수리검 사용을 제안하시겠습니까?\n모든 플레이어가 동의해야 사용됩니다.'),
+            actions: [
+              adaptive.AdaptiveDialogAction(text: '취소', onPressed: () {}),
+              adaptive.AdaptiveDialogAction(
+                text: '제안',
+                isDefaultAction: true,
+                onPressed: () {},
+              ),
+            ],
+          )
+          .then((_) => true)
+          .catchError((_) => false);
 
-      if (shouldPropose == true && mounted) {
+      if (shouldPropose && mounted) {
+        await HapticFeedbackUtils.heavy();
         ref
             .read(gameStateProvider(_roomId!).notifier)
             .proposeShurikenUse(_currentPlayerId!);
