@@ -56,6 +56,24 @@ class RoomRepository {
     await _supabase.from('rooms').update({'status': status}).eq('id', roomId);
   }
 
+  Future<void> updateRoom({
+    required String roomId,
+    int? currentLevel,
+    int? lives,
+    int? shurikens,
+    List<int>? playedCards,
+  }) async {
+    final updates = <String, dynamic>{};
+    if (currentLevel != null) updates['current_level'] = currentLevel;
+    if (lives != null) updates['lives'] = lives;
+    if (shurikens != null) updates['shurikens'] = shurikens;
+    if (playedCards != null) updates['played_cards'] = playedCards;
+
+    if (updates.isNotEmpty) {
+      await _supabase.from('rooms').update(updates).eq('id', roomId);
+    }
+  }
+
   Future<void> deleteRoom(String roomId) async {
     await _supabase.from('rooms').delete().eq('id', roomId);
   }
