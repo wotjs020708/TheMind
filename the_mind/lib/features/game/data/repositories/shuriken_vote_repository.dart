@@ -35,7 +35,7 @@ class ShurikenVoteRepository {
   /// 특정 제안의 모든 투표 조회
   ///
   /// [proposalId]: 제안 ID
-  /// Returns: List<Map<String, dynamic>> - 투표 목록
+  /// Returns: `List<Map<String, dynamic>>` - 투표 목록
   Future<List<Map<String, dynamic>>> getVotes(String proposalId) async {
     final response = await _supabase
         .from('shuriken_votes')
@@ -48,7 +48,7 @@ class ShurikenVoteRepository {
   /// 특정 제안에 대한 투표 실시간 구독
   ///
   /// [proposalId]: 제안 ID
-  /// Returns: Stream<List<Map<String, dynamic>>> - 투표 목록 스트림
+  /// Returns: `Stream<List<Map<String, dynamic>>>` - 투표 목록 스트림
   Stream<List<Map<String, dynamic>>> subscribeToVotes(String proposalId) {
     return _supabase
         .from('shuriken_votes')

@@ -94,7 +94,8 @@ class PlayerRepository {
   /// JSON을 Player 모델로 변환 (cards는 int[] → GameCard[])
   Player _playerFromJson(Map<String, dynamic> json) {
     final cardNumbers = (json['cards'] as List?)?.cast<int>() ?? [];
-    final cards = cardNumbers.map((num) => GameCard(number: num)).toList();
+    final cards =
+        cardNumbers.map((cardNum) => GameCard(number: cardNum)).toList();
 
     return Player(
       id: json['id'],

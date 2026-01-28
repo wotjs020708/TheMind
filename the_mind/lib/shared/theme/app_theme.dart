@@ -52,7 +52,7 @@ class AppTheme {
   // 그림자
   static List<BoxShadow> elevation1 = [
     BoxShadow(
-      color: Colors.black.withOpacity(0.1),
+      color: Colors.black.withValues(alpha: 0.1),
       blurRadius: 4,
       offset: const Offset(0, 2),
     ),
@@ -60,7 +60,7 @@ class AppTheme {
 
   static List<BoxShadow> elevation2 = [
     BoxShadow(
-      color: Colors.black.withOpacity(0.15),
+      color: Colors.black.withValues(alpha: 0.15),
       blurRadius: 8,
       offset: const Offset(0, 4),
     ),
@@ -68,7 +68,7 @@ class AppTheme {
 
   static List<BoxShadow> elevation3 = [
     BoxShadow(
-      color: Colors.black.withOpacity(0.2),
+      color: Colors.black.withValues(alpha: 0.2),
       blurRadius: 12,
       offset: const Offset(0, 6),
     ),
@@ -76,7 +76,7 @@ class AppTheme {
 
   static List<BoxShadow> glowEffect = [
     BoxShadow(
-      color: primaryColor.withOpacity(0.3),
+      color: primaryColor.withValues(alpha: 0.3),
       blurRadius: 20,
       spreadRadius: 2,
     ),
@@ -84,7 +84,7 @@ class AppTheme {
 
   static List<BoxShadow> cardShadow = [
     BoxShadow(
-      color: accentColor.withOpacity(0.2),
+      color: accentColor.withValues(alpha: 0.2),
       blurRadius: 15,
       spreadRadius: 1,
     ),
@@ -195,7 +195,7 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMd),
-          borderSide: BorderSide(color: textMuted.withOpacity(0.3)),
+          borderSide: BorderSide(color: textMuted.withValues(alpha: 0.3)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMd),

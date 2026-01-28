@@ -182,7 +182,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   Container(
                     padding: const EdgeInsets.all(AppTheme.spacingLg),
                     decoration: BoxDecoration(
-                      color: AppTheme.surfaceColor.withOpacity(0.5),
+                      color: AppTheme.surfaceColor.withValues(alpha: 0.5),
                       borderRadius: const BorderRadius.vertical(
                         bottom: Radius.circular(AppTheme.radiusLg),
                       ),
@@ -301,7 +301,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                               child: Icon(
                                 Icons.style_outlined,
                                 size: 40,
-                                color: AppTheme.textMuted.withOpacity(0.5),
+                                color: AppTheme.textMuted.withValues(
+                                  alpha: 0.5,
+                                ),
                               ),
                             ),
                         ],
@@ -336,13 +338,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   Container(
                     padding: const EdgeInsets.all(AppTheme.spacingLg),
                     decoration: BoxDecoration(
-                      color: AppTheme.surfaceColor.withOpacity(0.7),
+                      color: AppTheme.surfaceColor.withValues(alpha: 0.7),
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(AppTheme.radiusXl),
                       ),
                       border: Border(
                         top: BorderSide(
-                          color: AppTheme.primaryColor.withOpacity(0.3),
+                          color: AppTheme.primaryColor.withValues(alpha: 0.3),
                           width: 2,
                         ),
                       ),

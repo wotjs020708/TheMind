@@ -12,7 +12,6 @@ class ShurikensDisplay extends StatefulWidget {
 
 class _ShurikensDisplayState extends State<ShurikensDisplay> {
   bool _shouldAnimate = false;
-  bool _isIncreasing = false;
 
   @override
   void didUpdateWidget(ShurikensDisplay oldWidget) {
@@ -22,7 +21,6 @@ class _ShurikensDisplayState extends State<ShurikensDisplay> {
     if (widget.shurikens != oldWidget.shurikens) {
       setState(() {
         _shouldAnimate = true;
-        _isIncreasing = widget.shurikens > oldWidget.shurikens;
       });
 
       // 애니메이션 후 상태 초기화
