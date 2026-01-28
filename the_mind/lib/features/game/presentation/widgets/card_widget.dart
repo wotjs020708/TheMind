@@ -44,7 +44,7 @@ class CardWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppTheme.radiusMd - 2),
                     gradient: RadialGradient(
                       colors: [
-                        Colors.white.withOpacity(0.1),
+                        Colors.white.withValues(alpha: 0.1),
                         Colors.transparent,
                       ],
                       center: Alignment.topLeft,
@@ -65,7 +65,9 @@ class CardWidget extends StatelessWidget {
                       isPlayable
                           ? [
                             Shadow(
-                              color: AppTheme.accentColor.withOpacity(0.3),
+                              color: AppTheme.accentColor.withValues(
+                                alpha: 0.3,
+                              ),
                               blurRadius: 8,
                             ),
                           ]

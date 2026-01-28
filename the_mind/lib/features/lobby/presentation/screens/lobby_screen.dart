@@ -294,11 +294,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                                   decoration: BoxDecoration(
                                     color:
                                         isCurrentPlayer
-                                            ? AppTheme.primaryColor.withOpacity(
-                                              0.2,
+                                            ? AppTheme.primaryColor.withValues(
+                                              alpha: 0.2,
                                             )
-                                            : AppTheme.surfaceColor.withOpacity(
-                                              0.5,
+                                            : AppTheme.surfaceColor.withValues(
+                                              alpha: 0.5,
                                             ),
                                     borderRadius: BorderRadius.circular(
                                       AppTheme.radiusMd,
@@ -326,7 +326,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                                               isHost
                                                   ? null
                                                   : AppTheme.accentColor
-                                                      .withOpacity(0.3),
+                                                      .withValues(alpha: 0.3),
                                           shape: BoxShape.circle,
                                         ),
                                         child: Center(

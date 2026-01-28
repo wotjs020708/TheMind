@@ -11,13 +11,11 @@ class LivesDisplay extends StatefulWidget {
 }
 
 class _LivesDisplayState extends State<LivesDisplay> {
-  int _previousLives = 0;
   bool _shouldShake = false;
 
   @override
   void initState() {
     super.initState();
-    _previousLives = widget.lives;
   }
 
   @override
@@ -28,7 +26,6 @@ class _LivesDisplayState extends State<LivesDisplay> {
     if (widget.lives < oldWidget.lives) {
       setState(() {
         _shouldShake = true;
-        _previousLives = widget.lives;
       });
 
       // 애니메이션 후 shake 상태 초기화
@@ -39,8 +36,6 @@ class _LivesDisplayState extends State<LivesDisplay> {
           });
         }
       });
-    } else {
-      _previousLives = widget.lives;
     }
   }
 

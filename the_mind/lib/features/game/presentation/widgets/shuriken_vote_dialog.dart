@@ -47,8 +47,9 @@ class _ShurikenVoteDialogState extends ConsumerState<ShurikenVoteDialog> {
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
+              final navigator = Navigator.of(context);
               Future.delayed(const Duration(seconds: 1), () {
-                if (mounted) Navigator.of(context).pop();
+                if (mounted) navigator.pop();
               });
             }
           });

@@ -162,7 +162,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   children: [
                     Expanded(
                       child: Divider(
-                        color: AppTheme.textMuted.withOpacity(0.3),
+                        color: AppTheme.textMuted.withValues(alpha: 0.3),
                       ),
                     ),
                     Padding(
@@ -176,7 +176,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     Expanded(
                       child: Divider(
-                        color: AppTheme.textMuted.withOpacity(0.3),
+                        color: AppTheme.textMuted.withValues(alpha: 0.3),
                       ),
                     ),
                   ],
@@ -247,10 +247,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Container(
       padding: const EdgeInsets.all(AppTheme.spacingLg),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor.withOpacity(0.5),
+        color: AppTheme.surfaceColor.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         border: Border.all(
-          color: AppTheme.primaryColor.withOpacity(0.2),
+          color: AppTheme.primaryColor.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
