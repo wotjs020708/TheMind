@@ -79,6 +79,14 @@ lib/
 
 ## 📋 Development
 
+### Supabase Backend Setup
+
+See [../docs/SUPABASE_SETUP.md](../docs/SUPABASE_SETUP.md) for detailed Supabase configuration guide including:
+- Creating a Supabase project
+- Database schema setup
+- RLS (Row Level Security) configuration
+- Realtime subscriptions
+
 ### Running Tests
 ```bash
 flutter test
