@@ -12,6 +12,7 @@ import 'package:the_mind/features/game/presentation/providers/shuriken_proposal_
 import 'package:the_mind/features/lobby/data/repositories/room_repository.dart';
 import 'package:the_mind/shared/providers/supabase_provider.dart';
 import 'package:the_mind/shared/widgets/connection_status_banner.dart';
+import 'package:the_mind/shared/theme/app_theme.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   final String roomCode;
@@ -167,164 +168,241 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         }
 
         return Scaffold(
-          appBar: AppBar(
-            title: Text('레벨 ${gameState.currentLevel}'),
-            centerTitle: true,
-            leading: IconButton(
-              icon: const Icon(Icons.exit_to_app),
-              onPressed: () {
-                context.go('/');
-              },
+          body: Container(
+            decoration: const BoxDecoration(
+              gradient: AppTheme.backgroundGradient,
             ),
-          ),
-          body: SafeArea(
-            child: Column(
-              children: [
-                // 연결 상태 배너
-                const ConnectionStatusBanner(),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  // 연결 상태 배너
+                  const ConnectionStatusBanner(),
 
-                // 상단: 생명, 수리검
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      LivesDisplay(lives: gameState.lives),
-                      const SizedBox(width: 32),
-                      ShurikensDisplay(shurikens: gameState.shurikens),
-                    ],
-                  ),
-                ),
-
-                const Divider(),
-
-                // 다른 플레이어 상태
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
-                  ),
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children:
-                        otherPlayers.map((player) {
-                          return PlayerStatusWidget(
-                            playerName: player.name,
-                            cardsRemaining: player.cards.length,
-                          );
-                        }).toList(),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // 중앙: 플레이된 카드 덱
-                Expanded(
-                  child: Center(
+                  // 상단: 레벨 + 생명, 수리검
+                  Container(
+                    padding: const EdgeInsets.all(AppTheme.spacingLg),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceColor.withOpacity(0.5),
+                      borderRadius: const BorderRadius.vertical(
+                        bottom: Radius.circular(AppTheme.radiusLg),
+                      ),
+                    ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          '플레이된 카드',
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        // 레벨 표시
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.exit_to_app,
+                                color: AppTheme.textSecondary,
+                              ),
+                              onPressed: () => context.go('/'),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppTheme.spacingLg,
+                                vertical: AppTheme.spacingSm,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: AppTheme.primaryGradient,
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusXl,
+                                ),
+                                boxShadow: AppTheme.glowEffect,
+                              ),
+                              child: Text(
+                                '레벨 ${gameState.currentLevel}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineMedium
+                                    ?.copyWith(color: AppTheme.textPrimary),
+                              ),
+                            ),
+                            const SizedBox(width: 48), // 균형을 위한 공간
+                          ],
                         ),
-                        const SizedBox(height: 16),
-                        if (playedCards.isNotEmpty)
-                          CardWidget(card: playedCards.last, isPlayable: false)
-                        else
-                          Container(
-                            width: 60,
-                            height: 90,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.grey,
-                                width: 2,
-                                strokeAlign: BorderSide.strokeAlignInside,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.style,
-                                size: 32,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ),
+                        const SizedBox(height: AppTheme.spacingMd),
+                        // 생명, 수리검
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            LivesDisplay(lives: gameState.lives),
+                            ShurikensDisplay(shurikens: gameState.shurikens),
+                          ],
+                        ),
                       ],
                     ),
                   ),
-                ),
 
-                // 수리검 제안 버튼
-                if (gameState.shurikens > 0)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: ElevatedButton.icon(
-                      onPressed: _proposeShurikenUse,
-                      icon: const Icon(Icons.star),
-                      label: const Text('수리검 사용 제안'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.amber,
-                        foregroundColor: Colors.black,
-                        minimumSize: const Size(double.infinity, 48),
+                  const SizedBox(height: AppTheme.spacingMd),
+
+                  // 다른 플레이어 상태
+                  if (otherPlayers.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppTheme.spacingMd,
+                      ),
+                      child: Wrap(
+                        spacing: AppTheme.spacingSm,
+                        runSpacing: AppTheme.spacingSm,
+                        children:
+                            otherPlayers.map((player) {
+                              return PlayerStatusWidget(
+                                playerName: player.name,
+                                cardsRemaining: player.cards.length,
+                              );
+                            }).toList(),
+                      ),
+                    ),
+
+                  const SizedBox(height: AppTheme.spacingLg),
+
+                  // 중앙: 플레이된 카드 덱
+                  Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '플레이된 카드',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: AppTheme.spacingMd),
+                          if (playedCards.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.all(AppTheme.spacingSm),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusMd,
+                                ),
+                                boxShadow: AppTheme.cardShadow,
+                              ),
+                              child: CardWidget(
+                                card: playedCards.last,
+                                isPlayable: false,
+                              ),
+                            )
+                          else
+                            Container(
+                              width: 70,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: AppTheme.textMuted,
+                                  width: 2,
+                                  strokeAlign: BorderSide.strokeAlignInside,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusMd,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.style_outlined,
+                                size: 40,
+                                color: AppTheme.textMuted.withOpacity(0.5),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ),
 
-                const SizedBox(height: 16),
-
-                // 하단: 내 손패
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(16),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        '내 카드',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                  // 수리검 제안 버튼
+                  if (gameState.shurikens > 0)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppTheme.spacingLg,
+                        vertical: AppTheme.spacingSm,
+                      ),
+                      child: SizedBox(
+                        height: 50,
+                        child: ElevatedButton.icon(
+                          onPressed: _proposeShurikenUse,
+                          icon: const Icon(Icons.star, size: 24),
+                          label: const Text('수리검 사용 제안'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.accentColor,
+                            foregroundColor: Colors.black87,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        height: 100,
-                        child:
-                            currentPlayer.cards.isEmpty
-                                ? const Center(
-                                  child: Text(
-                                    '카드가 없습니다',
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                )
-                                : ListView.separated(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: currentPlayer.cards.length,
-                                  separatorBuilder:
-                                      (context, index) =>
-                                          const SizedBox(width: 12),
-                                  itemBuilder: (context, index) {
-                                    final card = currentPlayer.cards[index];
-                                    return CardWidget(
-                                      card: card,
-                                      onTap: () => _playCard(card),
-                                    );
-                                  },
-                                ),
+                    ),
+
+                  const SizedBox(height: AppTheme.spacingSm),
+
+                  // 하단: 내 손패
+                  Container(
+                    padding: const EdgeInsets.all(AppTheme.spacingLg),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceColor.withOpacity(0.7),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(AppTheme.radiusXl),
                       ),
-                    ],
+                      border: Border(
+                        top: BorderSide(
+                          color: AppTheme.primaryColor.withOpacity(0.3),
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.person,
+                              color: AppTheme.accentColor,
+                              size: 20,
+                            ),
+                            const SizedBox(width: AppTheme.spacingSm),
+                            Text(
+                              '내 카드',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppTheme.spacingMd),
+                        SizedBox(
+                          height: 100,
+                          child:
+                              currentPlayer.cards.isEmpty
+                                  ? Center(
+                                    child: Text(
+                                      '카드가 없습니다',
+                                      style:
+                                          Theme.of(
+                                            context,
+                                          ).textTheme.bodyMedium,
+                                    ),
+                                  )
+                                  : ListView.separated(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: currentPlayer.cards.length,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppTheme.spacingMd,
+                                    ),
+                                    separatorBuilder:
+                                        (context, index) => const SizedBox(
+                                          width: AppTheme.spacingMd,
+                                        ),
+                                    itemBuilder: (context, index) {
+                                      final card = currentPlayer.cards[index];
+                                      return CardWidget(
+                                        card: card,
+                                        onTap: () => _playCard(card),
+                                      );
+                                    },
+                                  ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
