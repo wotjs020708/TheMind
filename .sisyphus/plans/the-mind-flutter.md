@@ -596,11 +596,75 @@ final gameEventsProvider = StreamProvider.family<List<GameEvent>, String>((ref, 
 
 ---
 
-## Phase 8: 추가 기능 (후순위)
+## Phase 8: HIG 준수 UI/UX 개선
+
+**예상 시간**: 6-8시간
+
+**목표**: Apple Human Interface Guidelines를 최대한 준수하여 네이티브 앱처럼 자연스러운 UI/UX 제공
+
+### 8.1 iOS 네이티브 디자인 패턴 적용
+
+- [ ] SF Symbols 스타일 아이콘 적용 (난이도: ⭐, 예상: 1시간)
+  - 생명(❤️) → SF Pro 하트 아이콘
+  - 수리검(⭐) → SF Pro 별 아이콘
+  - 일관된 아이콘 크기 및 간격 (44x44pt 터치 영역)
+  
+- [ ] Cupertino 위젯으로 전환 (난이도: ⭐⭐⭐, 예상: 3시간)
+  - `CupertinoPageScaffold`, `CupertinoNavigationBar` 사용
+  - `CupertinoButton` 스타일 통일
+  - iOS 네이티브 스타일 다이얼로그 (`CupertinoAlertDialog`)
+  - 수리검 제안 → Action Sheet 형태로 변경
+  
+- [ ] 타이포그래피 개선 (난이도: ⭐⭐, 예상: 1.5시간)
+  - SF Pro 폰트 패밀리 적용 (시스템 기본)
+  - Dynamic Type 지원 (텍스트 크기 접근성)
+  - 텍스트 계층 구조 명확화 (Large Title, Title, Body, Caption)
+  
+- [ ] 색상 시스템 재설계 (난이도: ⭐⭐, 예상: 1시간)
+  - iOS 시스템 컬러 활용 (`CupertinoColors.systemBlue` 등)
+  - 다크 모드 자동 지원
+  - 적절한 투명도 활용 (layering)
+  
+- [ ] 애니메이션 및 제스처 개선 (난이도: ⭐⭐⭐, 예상: 2시간)
+  - iOS 네이티브 전환 애니메이션 (스와이프 백)
+  - 햅틱 피드백 강화 (`HapticFeedback.lightImpact`)
+  - 카드 드래그 → iOS 스타일 long-press & drag
+  - 스프링 애니메이션 적용 (자연스러운 바운스)
+
+- [ ] 레이아웃 및 간격 조정 (난이도: ⭐⭐, 예상: 1.5시간)
+  - Safe Area 준수 (상단 노치, 하단 홈 버튼 영역)
+  - 표준 패딩 적용 (16pt, 20pt)
+  - 카드 그리드 간격 최적화 (8pt, 12pt)
+  - 리스트 행 높이 표준화 (44pt 이상)
+
+### 8.2 접근성 (Accessibility) 강화
+
+- [ ] VoiceOver 지원 (난이도: ⭐⭐, 예상: 1.5시간)
+  - Semantics 위젯으로 화면 읽기 지원
+  - 카드 번호 음성 안내
+  - 버튼 동작 명확한 설명
+
+- [ ] Dynamic Type 지원 (난이도: ⭐, 예상: 30분)
+  - 사용자 설정 텍스트 크기 반영
+  
+- [ ] 색각 이상 대응 (난이도: ⭐, 예상: 30분)
+  - 색상만으로 정보 전달 지양
+  - 아이콘 + 텍스트 병기
+
+### 8.3 성능 최적화
+
+- [ ] 60fps 유지 (난이도: ⭐⭐, 예상: 1시간)
+  - Flutter DevTools로 프레임 드롭 확인
+  - 불필요한 리빌드 제거 (const 위젯)
+  - 애니메이션 최적화
+
+---
+
+## Phase 9: 추가 기능 (후순위)
 
 **예상 시간**: 15-20시간
 
-### 8.1 변형 규칙
+### 9.1 변형 규칙
 
 - [ ] 블라인드 모드 구현 (난이도: ⭐⭐, 예상: 2시간)
   - 다른 플레이어 상태 숨김
@@ -608,13 +672,13 @@ final gameEventsProvider = StreamProvider.family<List<GameEvent>, String>((ref, 
 - [ ] 익스트림 모드 (시작 생명 -1) (난이도: ⭐, 예상: 1시간)
 - [ ] 초보자 모드 (레벨 1-3 생명 무적) (난이도: ⭐, 예상: 1시간)
 
-### 8.2 게임 기록
+### 9.2 게임 기록
 
 - [ ] 게임 히스토리 저장 (Supabase) (난이도: ⭐⭐, 예상: 2시간)
 - [ ] 통계 화면 (승률, 평균 레벨) (난이도: ⭐⭐, 예상: 3시간)
 - [ ] 리더보드 (최고 레벨) (난이도: ⭐⭐⭐, 예상: 3시간)
 
-### 8.3 AI 봇 (후순위)
+### 9.3 AI 봇 (후순위)
 
 - [ ] 간단한 AI 로직 설계 (난이도: ⭐⭐⭐⭐, 예상: 4시간)
   - 카드 분포 추정 (Bayesian 접근)
@@ -623,7 +687,7 @@ final gameEventsProvider = StreamProvider.family<List<GameEvent>, String>((ref, 
 - [ ] 1인 연습 모드 UI (난이도: ⭐⭐, 예상: 2시간)
 - [ ] AI 난이도 조절 (쉬움/보통/어려움) (난이도: ⭐⭐⭐, 예상: 3시간)
 
-### 8.4 다국어 지원
+### 9.4 다국어 지원
 
 - [ ] i18n 패키지 추가 (flutter_localizations) (난이도: ⭐, 예상: 30분)
 - [ ] 한국어/영어 번역 파일 작성 (난이도: ⭐⭐, 예상: 2시간)
@@ -684,20 +748,36 @@ final gameEventsProvider = StreamProvider.family<List<GameEvent>, String>((ref, 
 | Phase 5: 애니메이션 | 6-8시간 | 45시간 | 주요 애니메이션 동작 |
 | Phase 6: Vercel 배포 | 2-3시간 | 48시간 | Web 버전 접속 가능 |
 | Phase 7: 모바일 배포 | 4-6시간 | 54시간 | TestFlight / 내부 테스트 배포 |
-| **Phase 1-7 총합** | **~54시간** | | **MVP 완성** |
-| Phase 8: 추가 기능 | 15-20시간 | 74시간 | 변형 규칙 + AI 봇 (선택) |
-| 테스트 | 4-6시간 | 80시간 | 핵심 기능 테스트 통과 |
+| **Phase 1-7 총합** | **~54시간** | | **기능 구현 완료** |
+| Phase 8: HIG 준수 UI/UX | 6-8시간 | 62시간 | iOS 네이티브 스타일 완성 |
+| Phase 9: 추가 기능 | 15-20시간 | 82시간 | 변형 규칙 + AI 봇 (선택) |
+| 테스트 | 4-6시간 | 88시간 | 핵심 기능 테스트 통과 |
 
-**예상 개발 기간**: 약 10-12일 (하루 7-8시간 기준)
+**예상 개발 기간**: 약 11-13일 (하루 7-8시간 기준)
 
 ---
 
 ## 구현 우선순위 (MVP)
 
-### Must Have (Phase 1-6)
+### Must Have (Phase 1-7)
 1. 2-4인 멀티플레이어 기본 게임
 2. 생명/수리검 시스템
 3. 레벨 진행 및 보상
+4. Web 배포 (Vercel)
+5. 모바일 배포 (TestFlight/내부 테스트)
+
+### Should Have (Phase 8)
+1. **HIG 준수 UI/UX**: iOS 네이티브 느낌의 디자인
+2. Cupertino 위젯 전환
+3. 접근성 강화 (VoiceOver, Dynamic Type)
+4. 다크 모드 지원
+5. 햅틱 피드백
+
+### Nice to Have (Phase 9)
+1. 변형 규칙 모드
+2. 게임 기록 및 통계
+3. AI 봇 (1인 연습)
+4. 다국어 지원
 4. 실시간 동기화
 5. Web 배포
 
