@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:the_mind/shared/models/game_card.dart';
+import 'package:the_mind/shared/theme/app_theme.dart';
 
 class CardWidget extends StatelessWidget {
   final GameCard card;
@@ -21,29 +22,85 @@ class CardWidget extends StatelessWidget {
     final cardWidget = GestureDetector(
       onTap: isPlayable ? onTap : null,
       child: Container(
-        width: 60,
-        height: 90,
+        width: 70,
+        height: 100,
         decoration: BoxDecoration(
-          color: isPlayable ? Colors.white : Colors.grey[300],
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.black87, width: 2),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 4,
-              offset: const Offset(2, 2),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            '${card.number}',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: isPlayable ? Colors.black87 : Colors.grey[600],
-            ),
+          gradient: isPlayable ? AppTheme.cardGradient : null,
+          color: isPlayable ? null : Colors.grey[800],
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          border: Border.all(
+            color: isPlayable ? AppTheme.accentColor : Colors.grey[700]!,
+            width: 3,
           ),
+          boxShadow: isPlayable ? AppTheme.cardShadow : AppTheme.elevation1,
+        ),
+        child: Stack(
+          children: [
+            // 배경 패턴
+            if (isPlayable)
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd - 2),
+                    gradient: RadialGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.1),
+                        Colors.transparent,
+                      ],
+                      center: Alignment.topLeft,
+                      radius: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+            // 숫자
+            Center(
+              child: Text(
+                '${card.number}',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: isPlayable ? Colors.black87 : Colors.grey[600],
+                  shadows:
+                      isPlayable
+                          ? [
+                            Shadow(
+                              color: AppTheme.accentColor.withOpacity(0.3),
+                              blurRadius: 8,
+                            ),
+                          ]
+                          : null,
+                ),
+              ),
+            ),
+            // 작은 숫자 (왼쪽 위, 오른쪽 아래)
+            if (isPlayable) ...[
+              Positioned(
+                top: 6,
+                left: 8,
+                child: Text(
+                  '${card.number}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54,
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 6,
+                right: 8,
+                child: Text(
+                  '${card.number}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54,
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );

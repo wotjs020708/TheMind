@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../lobby/data/repositories/room_repository.dart';
 import '../../../../shared/providers/supabase_provider.dart';
+import '../../../../shared/theme/app_theme.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -98,111 +100,190 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // 타이틀
-              const Text(
-                '더 마인드',
-                style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'The Mind',
-                style: TextStyle(fontSize: 24, color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 64),
-
-              // 플레이어 수 선택
-              const Text(
-                '새 게임',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 16),
-
-              // 2명 버튼
-              ElevatedButton(
-                onPressed: _isLoading ? null : () => _createRoom(2),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppTheme.spacingLg),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // 타이틀
+                Column(
+                  children: [
+                    ShaderMask(
+                      shaderCallback:
+                          (bounds) =>
+                              AppTheme.primaryGradient.createShader(bounds),
+                      child: Text(
+                        '더 마인드',
+                        style: Theme.of(context).textTheme.displayLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                    ).animate().fadeIn(duration: 600.ms).scale(delay: 100.ms),
+                    const SizedBox(height: AppTheme.spacingSm),
+                    Text(
+                      'The Mind',
+                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        color: AppTheme.textSecondary,
+                        fontWeight: FontWeight.w300,
+                        letterSpacing: 2,
+                      ),
+                      textAlign: TextAlign.center,
+                    ).animate().fadeIn(delay: 200.ms),
+                  ],
                 ),
-                child:
-                    _isLoading
-                        ? const CircularProgressIndicator()
-                        : const Text('2명', style: TextStyle(fontSize: 18)),
-              ),
-              const SizedBox(height: 12),
+                const SizedBox(height: AppTheme.spacingXxl),
 
-              // 3명 버튼
-              ElevatedButton(
-                onPressed: _isLoading ? null : () => _createRoom(3),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                // 새 게임 섹션
+                _buildSection(
+                  context,
+                  title: '새 게임',
+                  icon: Icons.add_circle_outline,
+                  children: [
+                    _buildPlayerCountButton(
+                      context,
+                      2,
+                      '2명',
+                      Icons.people_outline,
+                    ),
+                    const SizedBox(height: AppTheme.spacingMd),
+                    _buildPlayerCountButton(context, 3, '3명', Icons.people),
+                    const SizedBox(height: AppTheme.spacingMd),
+                    _buildPlayerCountButton(context, 4, '4명', Icons.groups),
+                  ],
+                ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0),
+
+                const SizedBox(height: AppTheme.spacingXl),
+
+                // 구분선
+                Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        color: AppTheme.textMuted.withOpacity(0.3),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppTheme.spacingMd,
+                      ),
+                      child: Text(
+                        '또는',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        color: AppTheme.textMuted.withOpacity(0.3),
+                      ),
+                    ),
+                  ],
                 ),
-                child:
-                    _isLoading
-                        ? const CircularProgressIndicator()
-                        : const Text('3명', style: TextStyle(fontSize: 18)),
-              ),
-              const SizedBox(height: 12),
 
-              // 4명 버튼
-              ElevatedButton(
-                onPressed: _isLoading ? null : () => _createRoom(4),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child:
-                    _isLoading
-                        ? const CircularProgressIndicator()
-                        : const Text('4명', style: TextStyle(fontSize: 18)),
-              ),
+                const SizedBox(height: AppTheme.spacingXl),
 
-              const SizedBox(height: 48),
-              const Divider(),
-              const SizedBox(height: 24),
-
-              // 방 참가
-              const Text(
-                '방 참가',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 16),
-
-              // 방 코드 입력
-              TextField(
-                controller: _roomCodeController,
-                enabled: !_isLoading,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: '방 코드',
-                  hintText: '6자리 코드 입력',
-                ),
-                textCapitalization: TextCapitalization.characters,
-                maxLength: 6,
-              ),
-              const SizedBox(height: 16),
-
-              // 참가 버튼
-              ElevatedButton(
-                onPressed: _isLoading ? null : _joinRoom,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child:
-                    _isLoading
-                        ? const CircularProgressIndicator()
-                        : const Text('참가하기', style: TextStyle(fontSize: 18)),
-              ),
-            ],
+                // 방 참가 섹션
+                _buildSection(
+                  context,
+                  title: '방 참가',
+                  icon: Icons.login,
+                  children: [
+                    TextField(
+                      controller: _roomCodeController,
+                      enabled: !_isLoading,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        letterSpacing: 4,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                        labelText: '방 코드',
+                        hintText: 'ABC123',
+                        counterText: '',
+                        prefixIcon: const Icon(Icons.vpn_key_outlined),
+                        filled: true,
+                        fillColor: AppTheme.surfaceColor,
+                      ),
+                      textCapitalization: TextCapitalization.characters,
+                      maxLength: 6,
+                    ),
+                    const SizedBox(height: AppTheme.spacingMd),
+                    SizedBox(
+                      height: 56,
+                      child: ElevatedButton.icon(
+                        onPressed: _isLoading ? null : _joinRoom,
+                        icon:
+                            _isLoading
+                                ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                                : const Icon(Icons.arrow_forward),
+                        label: Text(_isLoading ? '참가 중...' : '참가하기'),
+                      ),
+                    ),
+                  ],
+                ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSection(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spacingLg),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceColor.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        border: Border.all(
+          color: AppTheme.primaryColor.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: AppTheme.primaryColor, size: 24),
+              const SizedBox(width: AppTheme.spacingSm),
+              Text(title, style: Theme.of(context).textTheme.headlineMedium),
+            ],
+          ),
+          const SizedBox(height: AppTheme.spacingMd),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlayerCountButton(
+    BuildContext context,
+    int count,
+    String label,
+    IconData icon,
+  ) {
+    return SizedBox(
+      height: 56,
+      child: ElevatedButton.icon(
+        onPressed: _isLoading ? null : () => _createRoom(count),
+        icon: Icon(icon, size: 24),
+        label: Text(label),
+        style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryColor),
       ),
     );
   }
