@@ -1,8 +1,9 @@
 {
-  "buildCommand": "export PATH=\"$PATH:$PWD/flutter/bin\" && cd the_mind && flutter build web --release --web-renderer canvaskit",
+  "buildCommand": "cd the_mind && $PWD/flutter/bin/flutter build web --release --web-renderer canvaskit",
   "outputDirectory": "the_mind/build/web",
   "framework": null,
-  "installCommand": "git clone https://github.com/flutter/flutter.git -b stable --depth 1 && export PATH=\"$PATH:$PWD/flutter/bin\" && flutter config --enable-web && flutter precache --web",
+  "installCommand": "git clone https://github.com/flutter/flutter.git -b stable --depth 1 && $PWD/flutter/bin/flutter config --enable-web && $PWD/flutter/bin/flutter precache --web",
+  "devCommand": "cd the_mind && flutter run -d web-server --web-hostname=0.0.0.0 --web-port=3000",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
