@@ -41,7 +41,7 @@ class PlayerRepository {
         .from('players')
         .select()
         .eq('room_id', roomId)
-        .order('position');
+        .order('created_at');
 
     return (response as List).map((json) => _playerFromJson(json)).toList();
   }
@@ -87,7 +87,7 @@ class PlayerRepository {
         .from('players')
         .stream(primaryKey: ['id'])
         .eq('room_id', roomId)
-        .order('position')
+        .order('created_at')
         .map((data) => data.map((json) => _playerFromJson(json)).toList());
   }
 
