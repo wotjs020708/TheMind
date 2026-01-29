@@ -24,7 +24,8 @@ final appRouter = GoRouter(
       name: 'game',
       builder: (context, state) {
         final roomCode = state.pathParameters['roomCode']!;
-        return GameScreen(roomCode: roomCode);
+        final playerId = state.uri.queryParameters['playerId'];
+        return GameScreen(roomCode: roomCode, playerId: playerId);
       },
     ),
   ],

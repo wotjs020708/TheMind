@@ -20,8 +20,9 @@ import 'package:the_mind/shared/theme/app_theme.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   final String roomCode;
+  final String? playerId;
 
-  const GameScreen({super.key, required this.roomCode});
+  const GameScreen({super.key, required this.roomCode, this.playerId});
 
   @override
   ConsumerState<GameScreen> createState() => _GameScreenState();
@@ -35,6 +36,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   void initState() {
     super.initState();
+    _currentPlayerId = widget.playerId;
     _loadRoomId();
   }
 
@@ -150,9 +152,24 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             ),
           ),
       data: (gameState) {
-        // 현재 플레이어 찾기 (로비에서 저장한 ID 사용 또는 첫 번째 플레이어)
-        _currentPlayerId ??=
-            gameState.players.isNotEmpty ? gameState.players.first.id : null;
+        // 현재 플레이어 ID가 없으면 에러 화면 표시
+        if (_currentPlayerId == null) {
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('플레이어 정보를 찾을 수 없습니다'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => context.go('/'),
+                    child: const Text('홈으로'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
 
         final currentPlayer = gameState.players.firstWhere(
           (p) => p.id == _currentPlayerId,

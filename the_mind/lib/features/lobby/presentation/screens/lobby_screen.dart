@@ -157,7 +157,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     // 게임이 시작되면 게임 화면으로 이동
     if (lobbyState.room!.status == 'playing') {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go('/game/${widget.roomCode}');
+        final playerId = lobbyState.currentPlayerId;
+        context.go('/game/${widget.roomCode}?playerId=$playerId');
       });
     }
 
