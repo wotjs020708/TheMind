@@ -34,14 +34,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       final roomRepo = RoomRepository(supabase);
 
       // 방 생성
+      debugPrint('🔵 방 생성 시작: $playerCount명');
       final room = await roomRepo.createRoom(playerCount);
+      debugPrint('✅ 방 생성 성공: ${room.code}');
 
       if (!mounted) return;
 
       await HapticFeedbackUtils.light();
       // 로비 화면으로 이동
+      debugPrint('🚀 로비로 이동: /lobby/${room.code}');
       context.push('/lobby/${room.code}');
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('❌ 방 생성 실패: $e');
+      debugPrint('스택 트레이스: $stackTrace');
       if (!mounted) return;
       await HapticFeedbackUtils.error();
       ScaffoldMessenger.of(
@@ -114,7 +119,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: Container(
         decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
         child: SafeArea(
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.all(AppTheme.spacingLg),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
