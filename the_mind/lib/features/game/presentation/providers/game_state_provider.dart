@@ -272,13 +272,20 @@ class GameStateNotifier extends StateNotifier<AsyncValue<GameState>> {
     state.whenData((currentState) {
       final newLives = currentState.lives - 1;
 
-      // 생명 감소
+      // 생명 감소 (로컬 상태 - 모든 클라이언트)
       state = AsyncValue.data(currentState.copyWith(lives: newLives));
-      roomRepo.updateRoom(roomId: roomId, lives: newLives);
 
-      // 패배 체크
-      if (gameLogic.checkDefeat(newLives)) {
-        _endGame(victory: false);
+      // DB 업데이트 및 패배 체크 (호스트만)
+      final isHost =
+          currentState.players.isNotEmpty &&
+          currentState.players.first.id == currentPlayerId;
+      if (isHost) {
+        roomRepo.updateRoom(roomId: roomId, lives: newLives);
+
+        // 패배 체크
+        if (gameLogic.checkDefeat(newLives)) {
+          _endGame(victory: false);
+        }
       }
     });
   }
@@ -335,20 +342,27 @@ class GameStateNotifier extends StateNotifier<AsyncValue<GameState>> {
   /// 수리검 사용 이벤트 처리
   void _handleShurikenUsed(GameEvent event) {
     state.whenData((currentState) {
-      // 수리검 사용: 모든 플레이어의 최소 카드 제거
+      // 수리검 사용: 모든 플레이어의 최소 카드 제거 (계산은 모든 클라이언트)
       final removedCards = gameLogic.useShurikenEffect(currentState.players);
 
-      // 수리검 감소
+      // 수리검 감소 (로컬 상태 - 모든 클라이언트)
       final newShurikens = currentState.shurikens - 1;
       state = AsyncValue.data(currentState.copyWith(shurikens: newShurikens));
-      roomRepo.updateRoom(roomId: roomId, shurikens: newShurikens);
 
-      // 각 플레이어 카드 업데이트
-      for (final entry in removedCards.entries) {
-        final playerId = entry.key;
-        final removedCard = entry.value;
-        if (removedCard != null) {
-          _removeCardFromPlayer(playerId, removedCard.number);
+      // DB 업데이트 및 카드 제거 (호스트만)
+      final isHost =
+          currentState.players.isNotEmpty &&
+          currentState.players.first.id == currentPlayerId;
+      if (isHost) {
+        roomRepo.updateRoom(roomId: roomId, shurikens: newShurikens);
+
+        // 각 플레이어 카드 업데이트
+        for (final entry in removedCards.entries) {
+          final playerId = entry.key;
+          final removedCard = entry.value;
+          if (removedCard != null) {
+            _removeCardFromPlayer(playerId, removedCard.number);
+          }
         }
       }
     });
@@ -484,10 +498,16 @@ class GameStateNotifier extends StateNotifier<AsyncValue<GameState>> {
       );
 
       if (allCardsPlayed) {
-        await eventRepo.sendEvent(
-          roomId: roomId,
-          eventType: GameEventType.levelComplete,
-        );
+        // 호스트만 이벤트 전송
+        final isHost =
+            currentState.players.isNotEmpty &&
+            currentState.players.first.id == currentPlayerId;
+        if (isHost) {
+          await eventRepo.sendEvent(
+            roomId: roomId,
+            eventType: GameEventType.levelComplete,
+          );
+        }
       }
     });
   }
@@ -495,6 +515,12 @@ class GameStateNotifier extends StateNotifier<AsyncValue<GameState>> {
   /// 실수 트리거
   Future<void> _triggerMistake(int cardNumber) async {
     state.whenData((currentState) async {
+      // 호스트만 실수 처리 수행
+      final isHost =
+          currentState.players.isNotEmpty &&
+          currentState.players.first.id == currentPlayerId;
+      if (!isHost) return;
+
       // 실수 처리: 낸 카드보다 작은 카드 공개 및 제거
       final discardedCards = gameLogic.handleMistake(
         cardNumber,
