@@ -15,9 +15,8 @@ doc/api/
 .env*
 !.env.example
 
-# Avoid committing generated files:
-*.g.dart
-*.freezed.dart
+# Note: Generated files ARE committed for Vercel deployment
+# Vercel cannot run build_runner, so we commit the generated files
 
 # Flutter/Dart/Pub related
 **/doc/api/
