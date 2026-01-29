@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import '../providers/lobby_provider.dart';
 import '../../../../shared/widgets/connection_status_banner.dart';
 import '../../../../shared/widgets/adaptive/adaptive_button.dart';
@@ -105,6 +107,69 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     await HapticFeedbackUtils.light();
     await ref.read(lobbyProvider(widget.roomCode).notifier).leaveLobby();
     if (mounted) context.go('/');
+  }
+
+  void _showQRDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: Colors.white,
+            title: const Text(
+              'QR 코드로 참가',
+              style: TextStyle(color: Colors.black87),
+              textAlign: TextAlign.center,
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: QrImageView(
+                    data: widget.roomCode,
+                    version: QrVersions.auto,
+                    size: 200,
+                    backgroundColor: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  '방 코드: ${widget.roomCode}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                    letterSpacing: 4,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'QR 코드를 스캔하거나\n방 코드를 직접 입력하세요',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.black54),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('닫기'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  Future<void> _shareRoomCode() async {
+    await HapticFeedbackUtils.light();
+    await Share.share(
+      '더 마인드 게임에 참여하세요!\n방 코드: ${widget.roomCode}',
+      subject: '더 마인드 - 방 초대',
+    );
   }
 
   @override
@@ -242,6 +307,30 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                           ],
                         ),
                       ).animate().fadeIn(delay: 200.ms).scale(),
+
+                      const SizedBox(height: AppTheme.spacingMd),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextButton.icon(
+                            onPressed: () => _showQRDialog(context),
+                            icon: const Icon(Icons.qr_code, size: 20),
+                            label: const Text('QR 코드'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppTheme.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(width: AppTheme.spacingMd),
+                          TextButton.icon(
+                            onPressed: () => _shareRoomCode(),
+                            icon: const Icon(Icons.share, size: 20),
+                            label: const Text('공유'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppTheme.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
 
                       const SizedBox(height: AppTheme.spacingXl),
 
