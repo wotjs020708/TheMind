@@ -1,9 +1,10 @@
 {
-  "buildCommand": "FLUTTER_ROOT=$PWD/flutter && cd the_mind && $FLUTTER_ROOT/bin/flutter build web --release --web-renderer canvaskit",
+  "buildCommand": "flutter/bin/flutter build web --release --web-renderer canvaskit",
   "outputDirectory": "the_mind/build/web",
   "framework": null,
-  "installCommand": "git clone https://github.com/flutter/flutter.git -b stable --depth 1 && $PWD/flutter/bin/flutter config --enable-web && $PWD/flutter/bin/flutter precache --web",
+  "installCommand": "git clone https://github.com/flutter/flutter.git -b stable --depth 1 && flutter/bin/flutter config --enable-web && flutter/bin/flutter precache --web",
   "devCommand": "cd the_mind && flutter run -d web-server --web-hostname=0.0.0.0 --web-port=3000",
+  "workingDirectory": "the_mind",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
