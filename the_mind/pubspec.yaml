@@ -83,11 +83,8 @@ flutter:
 
   uses-material-design: true
 
-  assets:
-    - .env
-  
-  # Note: .env file is only used for mobile builds
-  # Web builds use String.fromEnvironment with defaultValue
+  # Note: .env file is gitignored and only available in local mobile builds
+  # Web builds use String.fromEnvironment with defaultValue in main.dart
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
