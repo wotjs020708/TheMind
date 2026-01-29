@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide showAdaptiveDialog;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../lobby/data/repositories/room_repository.dart';
 import '../../../../shared/providers/supabase_provider.dart';
 import '../../../../shared/theme/app_theme.dart';
 import '../../../../shared/widgets/adaptive/adaptive_button.dart';
+import '../../../../shared/widgets/adaptive/adaptive_dialog.dart';
 import '../../../../core/utils/haptic_feedback_utils.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -150,7 +151,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ).animate().fadeIn(delay: 200.ms),
                   ],
                 ),
-                const SizedBox(height: AppTheme.spacingXxl),
+                const SizedBox(height: AppTheme.spacingMd),
+
+                // 게임 설명서 버튼
+                TextButton.icon(
+                  onPressed: _showGameInstructions,
+                  icon: const Icon(Icons.help_outline, size: 20),
+                  label: const Text('게임 설명서'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppTheme.primaryColor,
+                  ),
+                ),
+                const SizedBox(height: AppTheme.spacingLg),
 
                 // 새 게임 섹션
                 _buildSection(
@@ -301,6 +313,70 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         label: Text(label),
         color: AppTheme.primaryColor,
       ),
+    );
+  }
+
+  void _showGameInstructions() {
+    showAdaptiveDialog(
+      context: context,
+      title: '게임 설명서',
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildInstructionItem('🎯', '게임 목표', '1부터 100까지 카드를 낮은 순서대로 내기'),
+            const SizedBox(height: AppTheme.spacingMd),
+            _buildInstructionItem('🃏', '게임 방법', '말없이 타이밍 맞춰 카드 내기'),
+            const SizedBox(height: AppTheme.spacingMd),
+            _buildInstructionItem('❤️', '생명', '실수하면 생명 감소'),
+            const SizedBox(height: AppTheme.spacingMd),
+            _buildInstructionItem('⭐', '수리검', '모두 동의시 최소 카드 버리기'),
+            const SizedBox(height: AppTheme.spacingMd),
+            _buildInstructionItem('🏆', '승리/패배', '모든 레벨 클리어 시 승리, 생명 0이면 패배'),
+          ],
+        ),
+      ),
+      actions: [
+        AdaptiveDialogAction(
+          text: '확인',
+          onPressed: () {},
+          isDefaultAction: true,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInstructionItem(String emoji, String title, String description) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(emoji, style: const TextStyle(fontSize: 24)),
+        const SizedBox(width: AppTheme.spacingSm),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                description,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
