@@ -79,6 +79,15 @@ class GameStateNotifier extends StateNotifier<AsyncValue<GameState>> {
       // 초기 GameState 생성
       state = AsyncValue.data(_createGameState(room, players));
 
+      // 게임이 이미 시작된 상태이고 플레이어들에게 카드가 없으면 배분
+      if (room.status == 'playing') {
+        final hasCards = players.any((p) => p.cards.isNotEmpty);
+        if (!hasCards) {
+          // 카드 배분 (레벨 = 각 플레이어당 카드 수)
+          await _distributeCards(room.currentLevel);
+        }
+      }
+
       // Room 실시간 구독
       _roomSubscription = roomRepo
           .subscribeToRoom(roomId)
