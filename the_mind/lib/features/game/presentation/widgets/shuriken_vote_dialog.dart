@@ -165,7 +165,14 @@ class _ShurikenVoteDialogState extends ConsumerState<ShurikenVoteDialog> {
     });
 
     await ref
-        .read(gameStateProvider(widget.roomId).notifier)
+        .read(
+          gameStateProvider(
+            GameStateParams(
+              roomId: widget.roomId,
+              currentPlayerId: widget.currentPlayerId,
+            ),
+          ).notifier,
+        )
         .voteShurikenUse(
           proposalId: widget.proposalId,
           playerId: widget.currentPlayerId,

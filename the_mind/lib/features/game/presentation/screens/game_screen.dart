@@ -55,14 +55,25 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
     await HapticFeedbackUtils.medium();
     await ref
-        .read(gameStateProvider(_roomId!).notifier)
+        .read(
+          gameStateProvider(
+            GameStateParams(
+              roomId: _roomId!,
+              currentPlayerId: _currentPlayerId!,
+            ),
+          ).notifier,
+        )
         .playCard(playerId: _currentPlayerId!, cardNumber: card.number);
   }
 
   void _proposeShurikenUse() async {
     if (_currentPlayerId == null || _roomId == null) return;
 
-    final gameState = ref.read(gameStateProvider(_roomId!));
+    final gameState = ref.read(
+      gameStateProvider(
+        GameStateParams(roomId: _roomId!, currentPlayerId: _currentPlayerId!),
+      ),
+    );
     gameState.whenData((state) async {
       if (state.shurikens <= 0) return;
 
@@ -87,7 +98,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       if (shouldPropose && mounted) {
         await HapticFeedbackUtils.heavy();
         ref
-            .read(gameStateProvider(_roomId!).notifier)
+            .read(
+              gameStateProvider(
+                GameStateParams(
+                  roomId: _roomId!,
+                  currentPlayerId: _currentPlayerId!,
+                ),
+              ).notifier,
+            )
             .proposeShurikenUse(_currentPlayerId!);
       }
     });
@@ -108,7 +126,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         _lastProposalId = proposalId;
 
         // 현재 게임 상태에서 플레이어 수 가져오기
-        final gameStateAsync = ref.read(gameStateProvider(_roomId!));
+        final gameStateAsync = ref.read(
+          gameStateProvider(
+            GameStateParams(
+              roomId: _roomId!,
+              currentPlayerId: _currentPlayerId!,
+            ),
+          ),
+        );
         gameStateAsync.whenData((gameState) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
@@ -129,7 +154,11 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       }
     });
 
-    final gameStateAsync = ref.watch(gameStateProvider(_roomId!));
+    final gameStateAsync = ref.watch(
+      gameStateProvider(
+        GameStateParams(roomId: _roomId!, currentPlayerId: _currentPlayerId),
+      ),
+    );
 
     return gameStateAsync.when(
       loading:

@@ -13,6 +13,25 @@ import '../../data/repositories/game_event_repository.dart';
 import '../../data/repositories/shuriken_vote_repository.dart';
 import '../../../../shared/providers/supabase_provider.dart';
 
+/// Game State Provider 파라미터
+class GameStateParams {
+  final String roomId;
+  final String? currentPlayerId;
+
+  const GameStateParams({required this.roomId, this.currentPlayerId});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GameStateParams &&
+          runtimeType == other.runtimeType &&
+          roomId == other.roomId &&
+          currentPlayerId == other.currentPlayerId;
+
+  @override
+  int get hashCode => roomId.hashCode ^ currentPlayerId.hashCode;
+}
+
 /// Game State Provider
 ///
 /// 게임의 전체 상태를 관리하는 메인 Provider입니다.
@@ -20,7 +39,10 @@ import '../../../../shared/providers/supabase_provider.dart';
 /// - 실시간 동기화 (Supabase Realtime)
 /// - 게임 로직 조율 (GameLogicService 활용)
 final gameStateProvider = StateNotifierProvider.autoDispose
-    .family<GameStateNotifier, AsyncValue<GameState>, String>((ref, roomId) {
+    .family<GameStateNotifier, AsyncValue<GameState>, GameStateParams>((
+      ref,
+      params,
+    ) {
       final supabase = ref.watch(supabaseProvider);
       final roomRepo = RoomRepository(supabase);
       final playerRepo = PlayerRepository(supabase);
@@ -29,7 +51,8 @@ final gameStateProvider = StateNotifierProvider.autoDispose
       final gameLogic = GameLogicService();
 
       return GameStateNotifier(
-        roomId: roomId,
+        roomId: params.roomId,
+        currentPlayerId: params.currentPlayerId,
         roomRepo: roomRepo,
         playerRepo: playerRepo,
         eventRepo: eventRepo,
@@ -40,11 +63,13 @@ final gameStateProvider = StateNotifierProvider.autoDispose
 
 class GameStateNotifier extends StateNotifier<AsyncValue<GameState>> {
   final String roomId;
+  final String? currentPlayerId;
   final RoomRepository roomRepo;
   final PlayerRepository playerRepo;
   final GameEventRepository eventRepo;
   final ShurikenVoteRepository voteRepo;
   final GameLogicService gameLogic;
+  final Set<String> _processedEventIds = {};
 
   StreamSubscription<Room>? _roomSubscription;
   StreamSubscription<List<Player>>? _playersSubscription;
@@ -52,6 +77,7 @@ class GameStateNotifier extends StateNotifier<AsyncValue<GameState>> {
 
   GameStateNotifier({
     required this.roomId,
+    this.currentPlayerId,
     required this.roomRepo,
     required this.playerRepo,
     required this.eventRepo,
@@ -83,8 +109,13 @@ class GameStateNotifier extends StateNotifier<AsyncValue<GameState>> {
       if (room.status == 'playing') {
         final hasCards = players.any((p) => p.cards.isNotEmpty);
         if (!hasCards) {
-          // 카드 배분 (레벨 = 각 플레이어당 카드 수)
-          await _distributeCards(room.currentLevel);
+          // Only host distributes cards
+          final isHost =
+              players.isNotEmpty && players.first.id == currentPlayerId;
+          if (isHost) {
+            // 카드 배분 (레벨 = 각 플레이어당 카드 수)
+            await _distributeCards(room.currentLevel);
+          }
         }
       }
 
@@ -174,6 +205,10 @@ class GameStateNotifier extends StateNotifier<AsyncValue<GameState>> {
 
   /// GameEvent 처리
   void _handleGameEvent(GameEvent event) {
+    // Skip already processed events
+    if (_processedEventIds.contains(event.id)) return;
+    _processedEventIds.add(event.id);
+
     switch (event.eventType) {
       case GameEventType.cardPlayed:
         _handleCardPlayed(event);
@@ -203,6 +238,9 @@ class GameStateNotifier extends StateNotifier<AsyncValue<GameState>> {
     if (cardNumber == null) return;
 
     state.whenData((currentState) {
+      // Idempotency check: skip if card already played
+      if (currentState.playedCards.contains(cardNumber)) return;
+
       // 실수 여부 검증
       if (!gameLogic.isValidCardPlay(cardNumber, currentState.playedCards)) {
         // 실수 발생
@@ -278,8 +316,13 @@ class GameStateNotifier extends StateNotifier<AsyncValue<GameState>> {
           playedCards: [],
         );
 
-        // 카드 재배분
-        _distributeCards(nextLevel);
+        // Only host distributes cards
+        final isHost =
+            currentState.players.isNotEmpty &&
+            currentState.players.first.id == currentPlayerId;
+        if (isHost) {
+          _distributeCards(nextLevel);
+        }
       }
     });
   }
@@ -323,8 +366,15 @@ class GameStateNotifier extends StateNotifier<AsyncValue<GameState>> {
       eventType: GameEventType.gameStarted,
     );
 
-    // 레벨 1 카드 배분
-    _distributeCards(1);
+    // Only host distributes cards
+    state.whenData((currentState) {
+      final isHost =
+          currentState.players.isNotEmpty &&
+          currentState.players.first.id == currentPlayerId;
+      if (isHost) {
+        _distributeCards(1);
+      }
+    });
   }
 
   /// 카드 내기
