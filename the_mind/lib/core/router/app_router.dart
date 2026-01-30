@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:the_mind/features/home/presentation/screens/home_screen.dart';
 import 'package:the_mind/features/lobby/presentation/screens/lobby_screen.dart';
 import 'package:the_mind/features/game/presentation/screens/game_screen.dart';
+import 'package:the_mind/features/game/presentation/screens/result_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -26,6 +27,14 @@ final appRouter = GoRouter(
         final roomCode = state.pathParameters['roomCode']!;
         final playerId = state.uri.queryParameters['playerId'];
         return GameScreen(roomCode: roomCode, playerId: playerId);
+      },
+    ),
+    GoRoute(
+      path: '/result/:roomCode',
+      name: 'result',
+      builder: (context, state) {
+        final roomCode = state.pathParameters['roomCode']!;
+        return ResultScreen(roomCode: roomCode);
       },
     ),
   ],
